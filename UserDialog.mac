@@ -1,0 +1,76 @@
+﻿'  Date: 26.07.2020
+'  Time: 17:37:54
+'Author: marumug2
+'Version: 2217.1437
+'VersionLabel: dialog function update
+
+'#Language "WWB-COM"
+'#Uses "*<Report>"
+'#Uses "*Config"
+
+Option UsesAmbiguousError On
+Option Explicit
+
+Sub Main()
+	CallDialog()
+End Sub
+
+
+Public Function CallDialog() As Boolean
+
+	On Error GoTo errHandler
+
+	InitialProjectConfig()
+
+	Begin Dialog UserDialog 680,264,"Naming Convention Solver",.DialogFunc ' %GRID:10,7,1,1
+
+
+		GroupBox 30,100,630,49,"Tests Location",.GroupBoxTestsLocation
+		TextBox 50,127,590,21,.TextBoxTestsLocation
+
+		OKButton 130,200,90,21,.OKButton
+		PushButton 300,200,90,21,"Exit"
+	End Dialog
+
+	Dim dlg As UserDialog
+	Dialog dlg
+	If (dlg.TextBoxTestsLocation =  "*UserTraining:\Test_Group\SYS.5_System_Test\Functional_Tests\TestSpec") Or _
+		(dlg.TextBoxTestsLocation = "") Then
+		Return False
+	Else
+		Return True
+	End If
+
+
+errHandler:
+	Report.Error(Err.Description)
+	Return False
+
+End Function
+
+
+Function DialogFunc(DlgItem$, Action%, SuppValue?) As Boolean
+
+	Dim iCounter As Integer
+
+	Select Case Action%
+	Case 1 ' Dialog box initialization
+		DialogBoxInitialization()
+
+	Case 3 ' TextBox or ComboBox text changed
+		Select Case DlgItem$
+		Case "TextBoxTestsLocation"
+			SetFunctionalTestsLocation(DlgText("TextBoxTestsLocation"))
+		End Select
+
+
+	End Select
+
+End Function
+
+Private Function DialogBoxInitialization() As Boolean
+
+	DlgText("TextBoxTestsLocation",GetFunctionalTestsLocation())
+End Function
+
+
