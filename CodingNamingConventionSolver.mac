@@ -1,0 +1,609 @@
+﻿'  Date: 26.07.2020
+'  Time: 20:29:23
+'Author: marumug2
+'Version: 2217.1440
+'VersionLabel: Version 1
+'Description:
+'
+'_____________________________
+'Dev Notify Date:06/06/2016 05:04:47
+
+'#Language "WWB-NET"
+'#Uses "*<tc_PreInit>"
+'#Uses "*<Util>"
+'#Uses "*<Report>"
+'#Uses "*<VariantMgr>"
+'#Uses "*<Excel_>"
+'#Uses "*Config"
+
+
+'#Uses "*UserDialog"
+
+Const MARK_VRDT = "Variant"
+Const MARK_BNDT = "Boolean"
+Const MARK_BTDT = "Byte"
+Const MARK_CRDT = "Currency"
+Const MARK_DTDT = "Date"
+Const MARK_DCDT = "Decimal"
+Const MARK_DBDT = "Double"
+Const MARK_HGDT = "Huge"
+Const MARK_ITDT = "Integer"
+Const MARK_LGDT = "Long"
+Const MARK_OBDT = "Object"
+Const MARK_SBYDT = "SByte"
+Const MARK_SNDT = "Single"
+Const MARK_STDT = "String"
+Const MARK_UHDT = "Uhuge"
+Const MARK_UIDT = "UInteger"
+Const MARK_ULDT = "ULong"
+Const MARK_ERDT = "Error"
+
+Const SET_MARK_VRDT = "vr"
+Const SET_MARK_BNDT = "bn"
+Const SET_MARK_BTDT = "bt"
+Const SET_MARK_CRDT = "cr"
+Const SET_MARK_DTDT = "dt"
+Const SET_MARK_DCDT = "dc"
+Const SET_MARK_DBDT = "db"
+Const SET_MARK_HGDT = "hg"
+Const SET_MARK_ITDT = "it"
+Const SET_MARK_LGDT = "lg"
+Const SET_MARK_OBDT = "ob"
+Const SET_MARK_SBYDT = "sby"
+Const SET_MARK_SNDT = "sn"
+Const SET_MARK_STDT = "st"
+Const SET_MARK_UHDT = "uh"
+Const SET_MARK_UIDT = "ui"
+Const SET_MARK_ULDT = "ul"
+Const SET_MARK_ERDT = "er"
+
+Const MARK_PERCONDITION = "Dim"
+Const STARTINDX = 5
+
+Const STRINGLEN_VRDT = 15
+Const STRINGLEN_BNDT = 15
+Const STRINGLEN_BTDT = 12
+Const STRINGLEN_CRDT = 16
+Const STRINGLEN_DTDT = 12
+Const STRINGLEN_DCDT = 15
+Const STRINGLEN_DBDT = 14
+Const STRINGLEN_HGDT = 12
+Const STRINGLEN_ITDT = 15
+Const STRINGLEN_LGDT = 12
+Const STRINGLEN_OBDT = 14
+Const STRINGLEN_SBYDT = 13
+Const STRINGLEN_SNDT = 14
+Const STRINGLEN_STDT = 14
+Const STRINGLEN_UHDT = 13
+Const STRINGLEN_UIDT = 16
+Const STRINGLEN_ULDT = 13
+Const STRINGLEN_ERDT = 13
+
+Option UsesAmbiguousError On
+Option Explicit
+
+
+Sub Main
+
+	Dim TI As TestItem
+
+	Dim Source As String
+	Dim CurIx As Long
+	Dim NxtIx As Long
+	Dim oldLine As String
+	Dim CurLine As String
+	Dim VSCnt As Byte
+	Dim SubString As String
+	Dim VarLength As Byte
+	Dim NewSubstring As String
+	Dim NewSource As String
+	Dim splLine() As String
+
+
+	If (False <> CallDialog()) Then
+		If TM.GetTestItem(GetFunctionalTestsLocation(), TI) Then
+
+			Source = TI.Program.Clone()
+			CurIx = 1
+			While CurIx<Len(Source)
+				NxtIx = InStr(CurIx,Source,vbCrLf)
+				If NxtIx <= 0 Then NxtIx = Len(Source)
+
+				CurLine=Mid(Source,CurIx,NxtIx-CurIx)
+				CurLine=Trim(CurLine)
+				CurLine=Replace(CurLine,vbTab,"")
+				splLine = Split(CurLine,MARK_VRDT)
+				If (UBound(splLine) > 0 ) Then
+					If (Trim(Mid(CurLine,Len(splLine(0)),Len(CurLine)-Len(MARK_VRDT))) = MARK_VRDT) And (0 <> InStr(CurLine, MARK_PERCONDITION)) And ("'" <> Mid(CurLine,1,1)) Then
+						VSCnt =	ProcessSpace_VarName(CurLine,SET_MARK_VRDT) - 1
+						If (SET_MARK_VRDT <> Mid(CurLine,StartIndx+VSCnt,2)) Then
+							SubString = Mid(CurLine,StartIndx+VSCnt,Len(CurLine)-STRINGLEN_VRDT)
+							VarLength = TrimVariable(SubString)
+							SubString = Mid(SubString,1,VarLength)
+							If (3 < VarLength) Then
+								Debug.Print SubString
+								NewSubstring = SET_MARK_VRDT + SubString
+								Debug.Print NewSubstring
+								NewSource = SearchReplace(Source,SubString,NewSubstring,SET_MARK_VRDT)
+								If (Len(NewSource) > 0) Then
+									Source = NewSource
+								End If
+							End If
+						End If
+					End If
+				End If
+
+				splLine = Split(CurLine,MARK_BNDT)
+				If (UBound(splLine) > 0 ) Then
+					If (Trim(Mid(CurLine,Len(splLine(0)),Len(CurLine)-Len(MARK_BNDT))) = MARK_BNDT) And (0 <> InStr(CurLine, MARK_PERCONDITION))  And ("'" <> Mid(CurLine,1,1)) Then
+						VSCnt =	ProcessSpace_VarName(CurLine,SET_MARK_BNDT) - 1
+						If (SET_MARK_BNDT <> Mid(CurLine,StartIndx+VSCnt,2)) Then
+							SubString = Mid(CurLine,StartIndx+VSCnt,Len(CurLine)-STRINGLEN_BNDT)
+							VarLength = TrimVariable(SubString)
+							SubString = Mid(SubString,1,VarLength)
+							If (3 < VarLength) Then
+								Debug.Print SubString
+								NewSubstring = SET_MARK_BNDT + SubString
+								Debug.Print NewSubstring
+								NewSource = SearchReplace(Source,SubString,NewSubstring,SET_MARK_BNDT)
+								If (Len(NewSource) > 0) Then
+									Source = NewSource
+								End If
+							End If
+						End If
+					End If
+				End If
+
+				splLine = Split(CurLine,MARK_BTDT)
+				If (UBound(splLine) > 0 ) Then
+					If (Trim(Mid(CurLine,Len(splLine(0)),Len(CurLine)-Len(MARK_BTDT))) = MARK_BTDT) And (0 <> InStr(CurLine, MARK_PERCONDITION))  And ("'" <> Mid(CurLine,1,1)) Then
+						VSCnt =	ProcessSpace_VarName(CurLine,SET_MARK_BTDT) - 1
+						If (SET_MARK_BTDT <> Mid(CurLine,StartIndx+VSCnt,2)) Then
+							SubString = Mid(CurLine,StartIndx+VSCnt,Len(CurLine)-STRINGLEN_BTDT)
+							VarLength = TrimVariable(SubString)
+							SubString = Mid(SubString,1,VarLength)
+							If (3 < VarLength) Then
+								Debug.Print SubString
+								NewSubstring = SET_MARK_BTDT + SubString
+								Debug.Print NewSubstring
+								NewSource = SearchReplace(Source,SubString,NewSubstring,SET_MARK_BTDT)
+								If (Len(NewSource) > 0) Then
+									Source = NewSource
+								End If
+							End If
+						End If
+					End If
+				End If
+
+				splLine = Split(CurLine,MARK_CRDT)
+				If (UBound(splLine) > 0 ) Then
+					If (Trim(Mid(CurLine,Len(splLine(0)),Len(CurLine)-Len(MARK_CRDT))) = MARK_CRDT) And (0 <> InStr(CurLine, MARK_PERCONDITION))  And ("'" <> Mid(CurLine,1,1)) Then
+						VSCnt =	ProcessSpace_VarName(CurLine,SET_MARK_CRDT) - 1
+						If (SET_MARK_CRDT <> Mid(CurLine,StartIndx+VSCnt,2)) Then
+							SubString = Mid(CurLine,StartIndx+VSCnt,Len(CurLine)-STRINGLEN_CRDT)
+							VarLength = TrimVariable(SubString)
+							SubString = Mid(SubString,1,VarLength)
+							If (3 < VarLength) Then
+								Debug.Print SubString
+								NewSubstring = SET_MARK_CRDT + SubString
+								Debug.Print NewSubstring
+								NewSource = SearchReplace(Source,SubString,NewSubstring,SET_MARK_CRDT)
+								If (Len(NewSource) > 0) Then
+									Source = NewSource
+								End If
+							End If
+						End If
+					End If
+				End If
+
+				splLine = Split(CurLine,MARK_DTDT)
+				If (UBound(splLine) > 0 ) Then
+					If (Trim(Mid(CurLine,Len(splLine(0)),Len(CurLine)-Len(MARK_DTDT))) = MARK_DTDT) And (0 <> InStr(CurLine, MARK_PERCONDITION))  And ("'" <> Mid(CurLine,1,1)) Then
+						VSCnt =	ProcessSpace_VarName(CurLine,SET_MARK_DTDT) - 1
+						If (SET_MARK_DTDT <> Mid(CurLine,StartIndx+VSCnt,2)) Then
+							SubString = Mid(CurLine,StartIndx+VSCnt,Len(CurLine)-STRINGLEN_DTDT)
+							VarLength = TrimVariable(SubString)
+							SubString = Mid(SubString,1,VarLength)
+							If (3 < VarLength) Then
+								Debug.Print SubString
+								NewSubstring = SET_MARK_DTDT + SubString
+								Debug.Print NewSubstring
+								NewSource = SearchReplace(Source,SubString,NewSubstring,SET_MARK_DTDT)
+								If (Len(NewSource) > 0) Then
+									Source = NewSource
+								End If
+							End If
+						End If
+					End If
+				End If
+
+				splLine = Split(CurLine,MARK_DCDT)
+				If (UBound(splLine) > 0 ) Then
+					If (Trim(Mid(CurLine,Len(splLine(0)),Len(CurLine)-Len(MARK_DCDT))) = MARK_DCDT) And (0 <> InStr(CurLine, MARK_PERCONDITION))  And ("'" <> Mid(CurLine,1,1)) Then
+						VSCnt =	ProcessSpace_VarName(CurLine,SET_MARK_DCDT) - 1
+						If (SET_MARK_DCDT <> Mid(CurLine,StartIndx+VSCnt,2)) Then
+							SubString = Mid(CurLine,StartIndx+VSCnt,Len(CurLine)-STRINGLEN_DCDT)
+							VarLength = TrimVariable(SubString)
+							SubString = Mid(SubString,1,VarLength)
+							If (3 < VarLength) Then
+								Debug.Print SubString
+								NewSubstring = SET_MARK_DCDT + SubString
+								Debug.Print NewSubstring
+								NewSource = SearchReplace(Source,SubString,NewSubstring,SET_MARK_DCDT)
+								If (Len(NewSource) > 0) Then
+									Source = NewSource
+								End If
+							End If
+						End If
+					End If
+				End If
+
+				splLine = Split(CurLine,MARK_DBDT)
+				If (UBound(splLine) > 0 ) Then
+					If (Trim(Mid(CurLine,Len(splLine(0)),Len(CurLine)-Len(MARK_DBDT))) = MARK_DBDT) And (0 <> InStr(CurLine, MARK_PERCONDITION))  And ("'" <> Mid(CurLine,1,1)) Then
+						VSCnt =	ProcessSpace_VarName(CurLine,SET_MARK_DBDT) - 1
+						If (SET_MARK_DBDT <> Mid(CurLine,StartIndx+VSCnt,2)) Then
+							SubString = Mid(CurLine,StartIndx+VSCnt,Len(CurLine)-STRINGLEN_DBDT)
+							VarLength = TrimVariable(SubString)
+							SubString = Mid(SubString,1,VarLength)
+							If (3 < VarLength) Then
+								Debug.Print SubString
+								NewSubstring = SET_MARK_DBDT + SubString
+								Debug.Print NewSubstring
+								NewSource = SearchReplace(Source,SubString,NewSubstring,SET_MARK_DBDT)
+								If (Len(NewSource) > 0) Then
+									Source = NewSource
+								End If
+							End If
+						End If
+					End If
+				End If
+
+				splLine = Split(CurLine,MARK_HGDT)
+				If (UBound(splLine) > 0 ) Then
+					If (Trim(Mid(CurLine,Len(splLine(0)),Len(CurLine)-Len(MARK_HGDT))) = MARK_HGDT) And (0 <> InStr(CurLine, MARK_PERCONDITION))  And ("'" <> Mid(CurLine,1,1)) Then
+						VSCnt =	ProcessSpace_VarName(CurLine,SET_MARK_HGDT) - 1
+						If (SET_MARK_HGDT <> Mid(CurLine,StartIndx+VSCnt,2)) Then
+							SubString = Mid(CurLine,StartIndx+VSCnt,Len(CurLine)-STRINGLEN_HGDT)
+							VarLength = TrimVariable(SubString)
+							SubString = Mid(SubString,1,VarLength)
+							If (3 < VarLength) Then
+								Debug.Print SubString
+								NewSubstring = SET_MARK_HGDT + SubString
+								Debug.Print NewSubstring
+								NewSource = SearchReplace(Source,SubString,NewSubstring,SET_MARK_HGDT)
+								If (Len(NewSource) > 0) Then
+									Source = NewSource
+								End If
+							End If
+						End If
+					End If
+				End If
+
+				splLine = Split(CurLine,MARK_ITDT)
+				If (UBound(splLine) > 0 ) Then
+					If (Trim(Mid(CurLine,Len(splLine(0)),Len(CurLine)-Len(MARK_ITDT))) = MARK_ITDT) And (0 <> InStr(CurLine, MARK_PERCONDITION))  And ("'" <> Mid(CurLine,1,1)) Then
+						VSCnt =	ProcessSpace_VarName(CurLine,SET_MARK_ITDT) - 1
+						If (SET_MARK_ITDT <> Mid(CurLine,StartIndx+VSCnt,2)) Then
+							SubString = Mid(CurLine,StartIndx+VSCnt,Len(CurLine)-STRINGLEN_ITDT)
+							VarLength = TrimVariable(SubString)
+							If (3 < VarLength) Then
+								SubString = Mid(SubString,1,VarLength)
+								Debug.Print SubString
+								NewSubstring = SET_MARK_ITDT + SubString
+								Debug.Print NewSubstring
+								NewSource = SearchReplace(Source,SubString,NewSubstring,SET_MARK_ITDT)
+								If (Len(NewSource) > 0) Then
+									Source = NewSource
+								End If
+							End If
+						End If
+					End If
+				End If
+
+				splLine = Split(CurLine,MARK_LGDT)
+				If (UBound(splLine) > 0 ) Then
+					If (Trim(Mid(CurLine,Len(splLine(0)),Len(CurLine)-Len(MARK_LGDT))) = MARK_LGDT) And (0 <> InStr(CurLine, MARK_PERCONDITION))  And ("'" <> Mid(CurLine,1,1)) Then
+						VSCnt =	ProcessSpace_VarName(CurLine,SET_MARK_LGDT) - 1
+						If (SET_MARK_LGDT <> Mid(CurLine,StartIndx+VSCnt,2)) Then
+							SubString = Mid(CurLine,StartIndx+VSCnt,Len(CurLine)-STRINGLEN_LGDT)
+							VarLength = TrimVariable(SubString)
+							SubString = Mid(SubString,1,VarLength)
+							If (3 < VarLength) Then
+								Debug.Print SubString
+								NewSubstring = SET_MARK_LGDT + SubString
+								Debug.Print NewSubstring
+								NewSource = SearchReplace(Source,SubString,NewSubstring,SET_MARK_LGDT)
+								If (Len(NewSource) > 0) Then
+									Source = NewSource
+								End If
+							End If
+						End If
+					End If
+				End If
+
+				splLine = Split(CurLine,MARK_OBDT)
+				If (UBound(splLine) > 0 ) Then
+					If (Trim(Mid(CurLine,Len(splLine(0)),Len(CurLine)-Len(MARK_OBDT))) = MARK_OBDT) And (0 <> InStr(CurLine, MARK_PERCONDITION))  And ("'" <> Mid(CurLine,1,1)) Then
+						VSCnt =	ProcessSpace_VarName(CurLine,SET_MARK_OBDT) - 1
+						If (SET_MARK_OBDT <> Mid(CurLine,StartIndx+VSCnt,2)) Then
+							SubString = Mid(CurLine,StartIndx+VSCnt,Len(CurLine)-STRINGLEN_OBDT)
+							VarLength = TrimVariable(SubString)
+							SubString = Mid(SubString,1,VarLength)
+							If (3 < VarLength) Then
+								Debug.Print SubString
+								NewSubstring = SET_MARK_OBDT + SubString
+								Debug.Print NewSubstring
+								NewSource = SearchReplace(Source,SubString,NewSubstring,SET_MARK_OBDT)
+								If (Len(NewSource) > 0) Then
+									Source = NewSource
+								End If
+							End If
+						End If
+					End If
+				End If
+
+				splLine = Split(CurLine,MARK_SBYDT)
+				If (UBound(splLine) > 0 ) Then
+					If (Trim(Mid(CurLine,Len(splLine(0)),Len(CurLine)-Len(MARK_SBYDT))) = MARK_SBYDT) And (0 <> InStr(CurLine, MARK_PERCONDITION))  And ("'" <> Mid(CurLine,1,1)) Then
+						VSCnt =	ProcessSpace_VarName(CurLine,SET_MARK_SBYDT) - 1
+						If (SET_MARK_SBYDT <> Mid(CurLine,StartIndx+VSCnt,3)) Then
+							SubString = Mid(CurLine,StartIndx+VSCnt,Len(CurLine)-STRINGLEN_SBYDT)
+							VarLength = TrimVariable(SubString)
+							SubString = Mid(SubString,1,VarLength)
+							If (3 < VarLength) Then
+								Debug.Print SubString
+								NewSubstring = SET_MARK_SBYDT + SubString
+								Debug.Print NewSubstring
+								NewSource = SearchReplace(Source,SubString,NewSubstring,SET_MARK_SBYDT)
+								If (Len(NewSource) > 0) Then
+									Source = NewSource
+								End If
+							End If
+						End If
+					End If
+				End If
+
+				splLine = Split(CurLine,MARK_SNDT)
+				If (UBound(splLine) > 0 ) Then
+					If (Trim(Mid(CurLine,Len(splLine(0)),Len(CurLine)-Len(MARK_SNDT))) = MARK_SNDT) And (0 <> InStr(CurLine, MARK_PERCONDITION))  And ("'" <> Mid(CurLine,1,1)) Then
+						VSCnt =	ProcessSpace_VarName(CurLine,SET_MARK_SNDT) - 1
+						If (SET_MARK_SNDT <> Mid(CurLine,StartIndx+VSCnt,2)) Then
+							SubString = Mid(CurLine,StartIndx+VSCnt,Len(CurLine)-STRINGLEN_SNDT)
+							VarLength = TrimVariable(SubString)
+							SubString = Mid(SubString,1,VarLength)
+							If (3 < VarLength) Then
+								Debug.Print SubString
+								NewSubstring = SET_MARK_SNDT + SubString
+								Debug.Print NewSubstring
+								NewSource = SearchReplace(Source,SubString,NewSubstring,SET_MARK_SNDT)
+								If (Len(NewSource) > 0) Then
+									Source = NewSource
+								End If
+							End If
+						End If
+					End If
+				End If
+
+				splLine = Split(CurLine,MARK_STDT)
+				If (UBound(splLine) > 0 ) Then
+					If (Trim(Mid(CurLine,Len(splLine(0)),Len(CurLine)-Len(MARK_STDT))) = MARK_STDT) And (0 <> InStr(CurLine, MARK_PERCONDITION))  And ("'" <> Mid(CurLine,1,1)) Then
+						VSCnt =	ProcessSpace_VarName(CurLine,SET_MARK_STDT) - 1
+						If (SET_MARK_STDT <> Mid(CurLine,StartIndx+VSCnt,2)) Then
+							SubString = Mid(CurLine,StartIndx+VSCnt,Len(CurLine)-STRINGLEN_STDT)
+							VarLength = TrimVariable(SubString)
+							SubString = Mid(SubString,1,VarLength)
+							If (3 < VarLength) Then
+								Debug.Print SubString
+								NewSubstring = SET_MARK_STDT + SubString
+								Debug.Print NewSubstring
+								NewSource = SearchReplace(Source,SubString,NewSubstring,SET_MARK_STDT)
+								If (Len(NewSource) > 0) Then
+									Source = NewSource
+								End If
+							End If
+						End If
+					End If
+				End If
+
+				splLine = Split(CurLine,MARK_UHDT)
+				If (UBound(splLine) > 0 ) Then
+					If (Trim(Mid(CurLine,Len(splLine(0)),Len(CurLine)-Len(MARK_UHDT))) = MARK_UHDT) And (0 <> InStr(CurLine, MARK_PERCONDITION))  And ("'" <> Mid(CurLine,1,1)) Then
+						VSCnt =	ProcessSpace_VarName(CurLine,SET_MARK_UHDT) - 1
+						If (SET_MARK_UHDT <> Mid(CurLine,StartIndx+VSCnt,2)) Then
+							SubString = Mid(CurLine,StartIndx+VSCnt,Len(CurLine)-STRINGLEN_UHDT)
+							VarLength = TrimVariable(SubString)
+							SubString = Mid(SubString,1,VarLength)
+							If (3 < VarLength) Then
+								Debug.Print SubString
+								NewSubstring = SET_MARK_UHDT + SubString
+								Debug.Print NewSubstring
+								NewSource = SearchReplace(Source,SubString,NewSubstring,SET_MARK_UHDT)
+								If (Len(NewSource) > 0) Then
+									Source = NewSource
+								End If
+							End If
+						End If
+					End If
+				End If
+
+				splLine = Split(CurLine,MARK_UIDT)
+				If (UBound(splLine) > 0 ) Then
+					If (Trim(Mid(CurLine,Len(splLine(0)),Len(CurLine)-Len(MARK_UIDT))) = MARK_UIDT) And (0 <> InStr(CurLine, MARK_PERCONDITION))  And ("'" <> Mid(CurLine,1,1)) Then
+						VSCnt =	ProcessSpace_VarName(CurLine,SET_MARK_UIDT) - 1
+						If (SET_MARK_UIDT <> Mid(CurLine,StartIndx+VSCnt,2)) Then
+							SubString = Mid(CurLine,StartIndx+VSCnt,Len(CurLine)-STRINGLEN_UIDT)
+							VarLength = TrimVariable(SubString)
+							SubString = Mid(SubString,1,VarLength)
+							If (3 < VarLength) Then
+								Debug.Print SubString
+								NewSubstring = SET_MARK_UIDT + SubString
+								Debug.Print NewSubstring
+								NewSource = SearchReplace(Source,SubString,NewSubstring,SET_MARK_UIDT)
+								If (Len(NewSource) > 0) Then
+									Source = NewSource
+								End If
+							End If
+						End If
+					End If
+				End If
+
+				splLine = Split(CurLine,MARK_ULDT)
+				If (UBound(splLine) > 0 ) Then
+					If (Trim(Mid(CurLine,Len(splLine(0)),Len(CurLine)-Len(MARK_ULDT))) = MARK_ULDT) And (0 <> InStr(CurLine, MARK_PERCONDITION))  And ("'" <> Mid(CurLine,1,1)) Then
+						VSCnt =	ProcessSpace_VarName(CurLine,SET_MARK_ULDT) - 1
+						If (SET_MARK_ULDT <> Mid(CurLine,StartIndx+VSCnt,2)) Then
+							SubString = Mid(CurLine,StartIndx+VSCnt,Len(CurLine)-STRINGLEN_ULDT)
+							VarLength = TrimVariable(SubString)
+							SubString = Mid(SubString,1,VarLength)
+							If (3 < VarLength) Then
+								Debug.Print SubString
+								NewSubstring = SET_MARK_ULDT + SubString
+								Debug.Print NewSubstring
+								NewSource = SearchReplace(Source,SubString,NewSubstring,SET_MARK_ULDT)
+								If (Len(NewSource) > 0) Then
+									Source = NewSource
+								End If
+							End If
+						End If
+					End If
+				End If
+
+				splLine = Split(CurLine,MARK_ERDT)
+				If (UBound(splLine) > 0 ) Then
+					If (Trim(Mid(CurLine,Len(splLine(0)),Len(CurLine)-Len(MARK_ERDT))) = MARK_ERDT) And (0 <> InStr(CurLine, MARK_PERCONDITION))  And ("'" <> Mid(CurLine,1,1)) Then
+						VSCnt =	ProcessSpace_VarName(CurLine,SET_MARK_ERDT) - 1
+						If (SET_MARK_ERDT <> Mid(CurLine,StartIndx+VSCnt,2)) Then
+							SubString = Mid(CurLine,StartIndx+VSCnt,Len(CurLine)-STRINGLEN_ERDT)
+							VarLength = TrimVariable(SubString)
+							SubString = Mid(SubString,1,VarLength)
+							If (3 < VarLength) Then
+								Debug.Print SubString
+								NewSubstring = SET_MARK_ERDT + SubString
+								Debug.Print NewSubstring
+								NewSource = SearchReplace(Source,SubString,NewSubstring,SET_MARK_ERDT)
+								If (Len(NewSource) > 0) Then
+									Source = NewSource
+								End If
+							End If
+						End If
+					End If
+				End If
+				CurIx = NxtIx+2
+				'Debug.Print Source
+			End While
+			'TI.Description = "fsd"
+			TI.Program = Source
+			'TI.Program.Replace("Dim vrRequest As Variant","Dim Request As Variant")
+		End If
+		'TI.Program = Source
+	End If
+
+End Sub
+
+Function ProcessSpace_VarName(ByVal CurLine As String,ByVal Variabletype As String) As Integer
+	Dim spaceCnt As Byte = 0
+	Dim index As Byte = 1
+	Dim length As Byte = 0
+	Dim splitCnt() As String
+	splitCnt = Split(CurLine,"Dim")
+
+	length = Len(CurLine)
+	While (index <= length)
+
+		If (" " = Mid(splitCnt(1),index,1)) Then
+			spaceCnt += 1
+
+		Else
+			index = length + 1
+		End If
+		index += 1
+	End While
+
+
+	ProcessSpace_VarName =spaceCnt
+
+End Function
+
+Function TrimVariable(ByVal substring As String) As Integer
+	Dim varLength As Byte = 0
+	Dim index As Byte  = 1
+	Dim length As Byte = 0
+	Dim bnLoopExit As Boolean = True
+
+	length = Len(SubString)
+	While (index <= length And bnLoopExit)
+		If (" " = Mid(SubString,index,1)) Or ("(" = Mid(SubString,index,1)) Or ("=" = Mid(SubString,index,1)) _
+			Or (")" = Mid(substring,index,1)) Or ("," = Mid(substring,index,1)) Or ("+" = Mid(substring,index,1)) _
+			Or ("-" = Mid(substring,index,1)) Or ("*" = Mid(substring,index,1)) Or ("/" = Mid(substring,index,1)) _
+			Or ("%" = Mid(substring,index,1)) Or (">" = Mid(substring,index,1)) Or ("<" = Mid(substring,index,1)) _
+			Or ("&" = Mid(substring,index,1)) Or ("|" = Mid(substring,index,1)) Or ("!" = Mid(substring,index,1)) _
+			Or ("^" = Mid(substring,index,1)) Or ("~" = Mid(substring,index,1)) Then
+
+			If VarLength > 0 Then
+				bnLoopExit = False
+			End If
+		Else
+			VarLength = VarLength + 1
+		End If
+		index += 1
+	End While
+
+	TrimVariable = VarLength
+End Function
+
+Function SearchReplace(ByRef Source As String,ByVal oldstring As String,ByVal newstring As String,ByVal VariableType As String) As String
+
+	Dim TIUpdate As TestItem
+	Dim CurIx As Long
+	Dim NxtIx As Long
+	Dim CurLine As String
+	Dim Indx As Byte
+	Dim getString As String
+	Dim VarLength As Byte
+	Dim NewSource As String
+
+
+	CurIx = 1
+	While CurIx<Len(Source)
+		NxtIx = InStr(CurIx,Source,vbCrLf)
+		If NxtIx <= 0 Then NxtIx = Len(Source)
+
+		CurLine=Mid(Source,CurIx,NxtIx-CurIx)
+		CurLine=Trim(CurLine)
+		CurLine=Replace(CurLine,vbTab,"")
+
+		MultiOccurance(CurLine,oldstring,newstring,VariableType)
+
+		NewSource &= CurLine
+		NewSource &= vbCrLf
+		CurIx = NxtIx+2
+	End While
+	'TIUpdate.Program = NewSource
+	SearchReplace = NewSource
+End Function
+
+Sub MultiOccurance(ByRef Currentline As String, ByVal oldstring As String, ByVal newstring As String,ByVal VariableType As String)
+	Dim getString As String
+	Dim VarLength As Byte
+	Dim StartIndx As Byte
+	Dim EndIndx As Byte = Len(oldstring)
+	Dim counter() As String
+	Dim occurance As Byte
+	Dim iter As Byte = 0
+
+	counter = Split(Currentline,oldstring)
+	If (UBound(counter) >= 0 ) Then
+		StartIndx = Len(counter(iter))
+		occurance = UBound(counter)
+		While occurance > iter
+			getString = Currentline.Substring(StartIndx,EndIndx)
+			If getString = oldstring Then
+				Currentline = Currentline.Remove(StartIndx,EndIndx)
+				Currentline = Currentline.Insert(StartIndx,newstring)
+			End If
+			iter += 1
+			StartIndx = Len(counter(iter)) + StartIndx + EndIndx + Len(VariableType)
+		End While
+	End If
+End Sub
