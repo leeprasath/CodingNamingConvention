@@ -1,0 +1,60 @@
+﻿'  Date: 24.07.2020
+'  Time: 22:01:45
+'Author: marumug2
+'Version: 2217.1436
+'VersionLabel: base version
+
+'#Language "WWB-COM"
+
+Option UsesAmbiguousError On
+Option Explicit
+
+Enum eTEST_SPEC_SRC
+	eDESCRIPTION_SRC
+	eCODE_SRC
+	eINVALID_TEST_SPEC_SRC
+End Enum
+
+Enum eEXPORT_FROMAT
+	eHTML
+	eEXCEL
+	eINVALID_EXPORT_FORMAT
+End Enum
+
+Public Const EXIT_GEN As Integer = 255
+Public Const WRN_TEXT As String = "WARNING! Test specification will be copied from Source code to Description field. The previous information in Description field will be lost!"
+
+Dim TEST_SPEC_SRC As Integer
+Dim EXPORT_FROMAT As Integer
+Dim FUNCTIONAL_TESTS As String
+
+Public Function GetTestSpecSrc
+    GetTestSpecSrc = TEST_SPEC_SRC
+End Function
+
+Public Function SetTestSpecSrc (Value As Integer)
+    TEST_SPEC_SRC = Value
+End Function
+
+
+Public Function GetExportFormat
+    GetExportFormat = EXPORT_FROMAT
+End Function
+
+Public Function SetExportFormat (Value As Integer)
+    EXPORT_FROMAT = Value
+End Function
+
+
+Public Function GetFunctionalTestsLocation
+    GetFunctionalTestsLocation = FUNCTIONAL_TESTS
+End Function
+
+Public Function SetFunctionalTestsLocation (Value As String)
+    FUNCTIONAL_TESTS = Value
+End Function
+
+Public Function InitialProjectConfig () As Boolean
+	'FUNCTIONAL_TESTS = "*DAG_IC_MFA:\Test_Group\Functional_Tests\MFA2_TRUCKS\APP\WEM_Warning_Event_Management"
+	FUNCTIONAL_TESTS = "*UserTraining:\Test_Group\SYS.5_System_Test\Functional_Tests\TestSpec"
+End Function
